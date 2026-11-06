@@ -1,0 +1,345 @@
+@import "tailwindcss";
+
+@theme {
+  --color-forest: #1f4d3a;
+  --color-forest-dark: #153728;
+  --color-forest-light: #e3ede7;
+  --color-terracotta: #b9532f;
+  --color-terracotta-dark: #9a4122;
+  --color-terracotta-light: #f7e4db;
+  --color-gold: #e0a526;
+  --color-gold-light: #fbefd2;
+  --color-sand: #f6efe4;
+  --color-sand-dark: #eadfcb;
+  --color-ink: #1e1e1c;
+  --color-muted: #6b645a;
+
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--color-sand);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+/* Motif géométrique inspiré des tissus d'Afrique de l'Ouest, volontairement discret */
+.pattern-african {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg fill='none' stroke='%23E0A526' stroke-opacity='.22' stroke-width='1.5'%3E%3Cpath d='M0 24 12 12l12 12-12 12zM24 24l12-12 12 12-12 12z'/%3E%3Cpath d='M12 0v6M36 0v6M12 42v6M36 42v6'/%3E%3C/g%3E%3Cg fill='%23E0A526' fill-opacity='.18'%3E%3Ccircle cx='12' cy='24' r='2'/%3E%3Ccircle cx='36' cy='24' r='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.pattern-stripe {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-terracotta) 0 22px,
+    var(--color-gold) 22px 36px,
+    var(--color-forest) 36px 52px,
+    var(--color-sand-dark) 52px 58px
+  );
+}
+
+/* Barre de défilement horizontale discrète (onglets catégories) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* Focus clavier visible partout (accessibilité) */
+:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.animate-pop {
+  animation: pop 0.18s ease-out;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(14 165 233 / 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgb(14 165 233 / 0);
+  }
+}
+.animate-new {
+  animation: pulse-ring 1.6s ease-out infinite;
+}
+
+/* ------------------------------------------------------------------ */
+/* Animations du site                                                  */
+/* ------------------------------------------------------------------ */
+
+/* Fond dégradé vivant de l'accueil */
+.hero-gradient {
+  background: linear-gradient(
+    120deg,
+    #102a1f 0%,
+    var(--color-forest) 22%,
+    #2b6a4f 38%,
+    var(--color-terracotta-dark) 62%,
+    var(--color-terracotta) 78%,
+    var(--color-gold) 100%
+  );
+  background-size: 300% 300%;
+  animation: gradient-shift 18s ease-in-out infinite;
+}
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 40%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+}
+
+/* Taches de lumière floues qui dérivent */
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.55;
+  animation: blob-drift 16s ease-in-out infinite alternate;
+}
+@keyframes blob-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(40px, -30px) scale(1.15);
+  }
+  100% {
+    transform: translate(-30px, 25px) scale(0.95);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-16px) rotate(calc(var(--r, 0deg) + 3deg));
+  }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.animate-float-slow {
+  animation: float 9s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 60s linear infinite;
+}
+.animate-spin-reverse {
+  animation: spin-slow 45s linear infinite reverse;
+}
+
+/* Apparition des mots du titre */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+.animate-scale-in {
+  animation: scale-in 1s cubic-bezier(0.2, 0.9, 0.25, 1.2) both;
+}
+
+/* Reflet qui balaie les boutons principaux */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: shine 3.5s ease-in-out infinite;
+}
+@keyframes shine {
+  0%,
+  60% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* Bande défilante */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 35s linear infinite;
+}
+.marquee-pause:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* Vapeur au-dessus des plats */
+@keyframes steam {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scaleX(1);
+  }
+  40% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scaleX(1.4);
+  }
+}
+.steam {
+  animation: steam 3.2s ease-out infinite;
+}
+
+/* Petit rebond (badge du panier) */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.35);
+  }
+  75% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.animate-bounce-in {
+  animation: bounce-in 0.5s ease-out;
+}
+
+/* Entrée douce de chaque page */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-page {
+  animation: page-in 0.45s ease-out both;
+}
+
+/* Apparition au défilement (composant <Reveal>) */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: var(--delay, 0ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 0.4;
+  }
+}
+.animate-scroll-hint {
+  animation: scroll-hint 1.8s ease-in-out infinite;
+}
+
+/* Respect du réglage « réduire les animations » */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+}
