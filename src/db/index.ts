@@ -37,6 +37,8 @@ function create(): DB {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { drizzle } = require("drizzle-orm/pglite") as typeof import("drizzle-orm/pglite");
   const dir = process.env.PGLITE_DIR === "memory" ? undefined : path.resolve(process.env.PGLITE_DIR ?? "./data/db");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  if (dir) (require("node:fs") as typeof import("node:fs")).mkdirSync(path.dirname(dir), { recursive: true });
   const client = new PGlite(dir);
   g.__dbClose = () => client.close();
   return drizzle(client, { schema }) as unknown as DB;

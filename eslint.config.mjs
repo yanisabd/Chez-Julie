@@ -12,5 +12,7 @@ const config = [
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_", destructuredArrayIgnorePattern: "^_" }],
     },
   },
+  // Images générées (next/og) : la balise <img> y est obligatoire
+  { files: ["src/app/**/opengraph-image.tsx", "src/app/**/apple-icon.tsx", "src/lib/brand-icon.tsx"], rules: { "@next/next/no-img-element": "off", "jsx-a11y/alt-text": "off" } },
 ];
 export default config;

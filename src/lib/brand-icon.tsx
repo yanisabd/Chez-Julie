@@ -8,7 +8,6 @@ export function IconImage({ size, maskable = false }: { size: number; maskable?:
   const inner = maskable ? Math.round(size * 0.72) : size;
   return (
     <div style={{ width: size, height: size, display: "flex", alignItems: "center", justifyContent: "center", background: "#1F4D3A" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
       <img src={ICON_DATA_URI} width={inner} height={inner} />
     </div>
   );

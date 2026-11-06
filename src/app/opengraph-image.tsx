@@ -26,7 +26,6 @@ export default async function OgImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
           <img src={ICON_DATA_URI} width={96} height={96} style={{ borderRadius: 24 }} />
           <div style={{ fontSize: 56, fontWeight: 700 }}>{s.business.name}</div>
         </div>
