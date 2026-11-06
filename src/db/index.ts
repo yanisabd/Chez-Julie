@@ -20,7 +20,11 @@ function create(): DB {
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       max: Number(process.env.DATABASE_POOL_MAX ?? 10),
-      ssl: process.env.DATABASE_SSL === "false" ? undefined : process.env.DATABASE_URL.includes("localhost") ? undefined : { rejectUnauthorized: false },
+      // Connexion chiffrée avec vérification du certificat (sauf base locale ou DATABASE_SSL=false)
+      ssl:
+        process.env.DATABASE_SSL === "false" || /@(localhost|127\.0\.0\.1)[:/]/.test(process.env.DATABASE_URL)
+          ? undefined
+          : { rejectUnauthorized: process.env.DATABASE_SSL !== "no-verify" },
     });
     g.__dbClose = () => pool.end();
     return drizzle(pool, { schema });
