@@ -79,7 +79,7 @@ export function Hero({ dishes, tagline, about, minLeadHours, maxAdvanceDays }: {
               aria-label={main.name}
             >
               <div className="animate-spin-slow size-full overflow-hidden rounded-full [animation-duration:90s]">
-                <DishImage imageId={main.imageId} name={main.name} className="size-full transition duration-700 group-hover:scale-110" rounded="rounded-full" />
+                <DishImage imageId={main.imageId} name={main.name} className="size-full transition duration-700 group-hover:scale-110" rounded="rounded-full" priority sizes="(min-width: 768px) 300px, 60vw" />
               </div>
               {/* vapeur */}
               <span className="steam absolute -top-6 left-[40%] h-10 w-3 rounded-full bg-white/50 blur-sm" />
@@ -95,7 +95,7 @@ export function Hero({ dishes, tagline, about, minLeadHours, maxAdvanceDays }: {
                 style={{ animationDelay: `${600 + i * 180}ms` }}
               >
                 <div className="animate-float group size-full" style={{ animationDelay: `${-i * 1.7}s` }}>
-                  <DishImage imageId={d.imageId} name={d.name} className="size-full shadow-2xl ring-4 ring-white/30 transition duration-500 group-hover:scale-110" rounded="rounded-full" />
+                  <DishImage imageId={d.imageId} name={d.name} className="size-full shadow-2xl ring-4 ring-white/30 transition duration-500 group-hover:scale-110" rounded="rounded-full" sizes="160px" />
                   <span className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-bold text-ink opacity-0 shadow-lg transition group-hover:opacity-100">
                     {d.name}
                   </span>

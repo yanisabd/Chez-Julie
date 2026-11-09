@@ -8,11 +8,44 @@ const PALETTES = [
   ["#C9772E", "#1F4D3A"],
 ];
 
+/** URL d'une photo à une largeur donnée (le serveur la redimensionne). */
+export const imageUrl = (id: string, w?: number) => `/api/images/${id}${w ? `?w=${w}` : ""}`;
+
+/** srcset standard : le navigateur choisit la taille adaptée à l'écran. */
+export const imageSrcSet = (id: string) => [320, 640, 1200].map((w) => `${imageUrl(id, w)} ${w}w`).join(", ");
+
 /** Photo du plat, ou une illustration élégante tant qu'aucune photo n'a été ajoutée. */
-export function DishImage({ imageId, name, className, rounded = "rounded-2xl" }: { imageId: string | null; name: string; className?: string; rounded?: string }) {
+export function DishImage({
+  imageId,
+  name,
+  className,
+  rounded = "rounded-2xl",
+  sizes = "(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 120px",
+  priority = false,
+}: {
+  imageId: string | null;
+  name: string;
+  className?: string;
+  rounded?: string;
+  /** Largeur d'affichage, pour que le navigateur télécharge la bonne taille */
+  sizes?: string;
+  /** Image importante en haut de page : chargée immédiatement */
+  priority?: boolean;
+}) {
   if (imageId) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={`/api/images/${imageId}`} alt={name} loading="lazy" className={cn("object-cover", rounded, className)} />;
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={imageUrl(imageId, 640)}
+        srcSet={imageSrcSet(imageId)}
+        sizes={sizes}
+        alt={name}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : undefined}
+        decoding="async"
+        className={cn("bg-sand-dark/60 object-cover", rounded, className)}
+      />
+    );
   }
   const h = [...name].reduce((n, c) => n + c.charCodeAt(0), 0);
   const [a, b] = PALETTES[h % PALETTES.length];

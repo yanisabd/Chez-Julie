@@ -5,6 +5,7 @@ import { ArrowLeft, Flame, AlertTriangle, CalendarDays } from "lucide-react";
 import { getProduct, daysLabel } from "@/server/catalog";
 import { getSettings } from "@/server/settings";
 import { DishImage } from "@/components/dish-image";
+import { ProductGallery } from "@/components/product-gallery";
 import { allergenLabel } from "@/lib/constants";
 import { AddToCart } from "./add-to-cart";
 
@@ -26,7 +27,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <ArrowLeft className="size-4" /> Retour à la carte
       </Link>
       <div className="grid gap-8 md:grid-cols-2">
-        <DishImage imageId={p.imageId} name={p.name} className="aspect-square w-full shadow-md md:sticky md:top-24" rounded="rounded-3xl" />
+        {p.imageId ? (
+          <ProductGallery images={[p.imageId, ...p.galleryImageIds]} name={p.name} />
+        ) : (
+          <DishImage imageId={null} name={p.name} className="aspect-square w-full shadow-md md:sticky md:top-24" rounded="rounded-3xl" />
+        )}
         <div>
           {p.category && <div className="text-sm font-semibold uppercase tracking-wide text-terracotta">{p.category.name}</div>}
           <h1 className="mt-1 flex items-center gap-3 text-3xl font-bold sm:text-4xl">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, ImagePlus, X } from "lucide-react";
+import { Plus, Trash2, ImagePlus, X, Star, Images } from "lucide-react";
 import { ActionForm, SubmitButton } from "@/components/action";
 import { Card, Field, Input, Textarea, Select, Check } from "@/components/ui";
 import { DishImage } from "@/components/dish-image";
@@ -28,6 +28,7 @@ type Product = {
   dailyLimit: number | null;
   maxPerOrder: number | null;
   imageId: string | null;
+  galleryImageIds: string[];
 };
 type OptGroup = { id?: number; name: string; required: boolean; maxChoices: number; options: { id?: number; name: string; price: string }[] };
 type RecipeLine = { ingredientId: number; quantity: number };
@@ -49,7 +50,8 @@ export function ProductForm({
   const [recipe, setRecipe] = useState<RecipeLine[]>(initialRecipe);
   const [track, setTrack] = useState(p?.stockQty != null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [removeImage, setRemoveImage] = useState(false);
+  const [photos, setPhotos] = useState<string[]>(p ? [p.imageId, ...p.galleryImageIds].filter((x): x is string => !!x) : []);
+  const [added, setAdded] = useState(0);
   const days = p?.availableDays.length ? p.availableDays : [1, 2, 3, 4, 5, 6, 7];
 
   const updGroup = (i: number, patch: Partial<OptGroup>) => setGroups((g) => g.map((x, j) => (j === i ? { ...x, ...patch } : x)));
@@ -59,7 +61,7 @@ export function ProductForm({
     <ActionForm action={saveProduct.bind(null, p?.id ?? null)} className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
       <input type="hidden" name="optionsJson" value={JSON.stringify(groups)} />
       <input type="hidden" name="recipeJson" value={JSON.stringify(recipe)} />
-      {removeImage && <input type="hidden" name="removeImage" value="on" />}
+      <input type="hidden" name="photosJson" value={JSON.stringify(photos)} />
 
       <div className="space-y-4">
         <Card className="space-y-4">
@@ -185,35 +187,59 @@ export function ProductForm({
 
       <div className="space-y-4">
         <Card>
-          <h2 className="font-sans text-lg font-bold">Photo</h2>
+          <h2 className="font-sans text-lg font-bold">Photos</h2>
+          <p className="text-sm text-muted">La 1re photo est la photo principale (carte, accueil). Les autres s’affichent en galerie sur la fiche du plat.</p>
           <div className="mt-3">
             {preview ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={preview} alt="" className="aspect-square w-full rounded-2xl object-cover" />
             ) : (
-              <DishImage imageId={removeImage ? null : (p?.imageId ?? null)} name={p?.name ?? "Nouveau plat"} className="aspect-square w-full" />
+              <DishImage imageId={photos[0] ?? null} name={p?.name ?? "Nouveau plat"} className="aspect-square w-full" />
             )}
           </div>
-          <label className="mt-3 flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-sand font-semibold hover:bg-sand-dark">
-            <ImagePlus className="size-5" /> {p?.imageId ? "Changer la photo" : "Ajouter une photo"}
-            <input
-              type="file"
-              name="image"
-              accept="image/jpeg,image/png,image/webp"
-              className="sr-only"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                setRemoveImage(false);
-                setPreview(f ? URL.createObjectURL(f) : null);
-              }}
-            />
-          </label>
-          {p?.imageId && !removeImage && !preview && (
-            <button type="button" onClick={() => setRemoveImage(true)} className="mt-2 w-full text-sm text-muted hover:text-red-700">
-              Retirer la photo
+          {photos.length > 1 && (
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {photos.slice(1).map((id) => (
+                <div key={id} className="group relative aspect-square overflow-hidden rounded-xl ring-1 ring-black/10">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={`/api/images/${id}?w=320`} alt="" className="size-full object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 flex justify-between bg-black/45 p-1">
+                    <button type="button" title="Mettre en photo principale" onClick={() => setPhotos((x) => [id, ...x.filter((y) => y !== id)])} className="grid size-7 place-items-center rounded-md text-white hover:bg-white/20">
+                      <Star className="size-4" />
+                    </button>
+                    <button type="button" title="Retirer cette photo" onClick={() => setPhotos((x) => x.filter((y) => y !== id))} className="grid size-7 place-items-center rounded-md text-white hover:bg-red-500/80">
+                      <X className="size-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <label className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-sand text-sm font-semibold hover:bg-sand-dark">
+              <ImagePlus className="size-5" /> {photos.length ? "Nouvelle photo principale" : "Ajouter une photo"}
+              <input
+                type="file"
+                name="image"
+                accept="image/jpeg,image/png,image/webp"
+                className="sr-only"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  setPreview(file ? URL.createObjectURL(file) : null);
+                }}
+              />
+            </label>
+            <label className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-sand text-sm font-semibold hover:bg-sand-dark">
+              <Images className="size-5" /> Ajouter à la galerie{added ? ` (${added})` : ""}
+              <input type="file" name="galleryAdd" multiple accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => setAdded(e.target.files?.length ?? 0)} />
+            </label>
+          </div>
+          {photos[0] && !preview && (
+            <button type="button" onClick={() => setPhotos((x) => x.slice(1))} className="mt-2 w-full text-sm text-muted hover:text-red-700">
+              Retirer la photo principale
             </button>
           )}
-          <p className="mt-2 text-xs text-muted">Photo carrée de préférence. Elle est automatiquement optimisée.</p>
+          <p className="mt-2 text-xs text-muted">Photos carrées de préférence. Elles sont automatiquement optimisées (8 photos maximum).</p>
         </Card>
 
         <Card className="space-y-1">

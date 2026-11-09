@@ -142,6 +142,8 @@ export const products = pgTable(
     allergens: text("allergens").array().notNull().default([]),
     priceCents: integer("price_cents").notNull(),
     imageId: uuid("image_id").references(() => images.id, { onDelete: "set null" }),
+    /** Photos supplémentaires (autres angles), affichées en galerie sur la fiche du plat */
+    galleryImageIds: uuid("gallery_image_ids").array().notNull().default([]),
     active: boolean("active").notNull().default(true),
     featured: boolean("featured").notNull().default(false),
     spicy: integer("spicy").notNull().default(0), // 0 à 3

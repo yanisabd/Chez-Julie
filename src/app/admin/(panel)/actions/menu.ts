@@ -90,10 +90,23 @@ export async function saveProduct(id: number | null, fd: FormData) {
     const recipe = recipeSchema.parse(JSON.parse(form.str(fd, "recipeJson") || "[]"));
     for (const g of options) for (const o of g.options) if (o.price && parsePriceToCents(o.price.replace("+", "")) == null) throw new UserError(`Supplément invalide pour « ${o.name} ».`);
 
-    let imageId: string | undefined | null;
+    // Photos : ordre choisi dans le formulaire (1re = principale) + nouvelles photos envoyées
+    let photos: string[] | undefined;
+    if (fd.has("photosJson")) {
+      photos = z.array(z.string().uuid()).max(20).parse(JSON.parse(form.str(fd, "photosJson") || "[]"));
+      if (id) {
+        // On n'accepte que des photos déjà liées à ce plat (sécurité)
+        const cur = await db.query.products.findFirst({ where: eq(schema.products.id, id), columns: { imageId: true, galleryImageIds: true } });
+        const allowed = new Set([cur?.imageId, ...(cur?.galleryImageIds ?? [])].filter(Boolean));
+        photos = photos.filter((p) => allowed.has(p));
+      } else photos = [];
+    }
     const file = fd.get("image");
-    if (file instanceof File && file.size > 0) imageId = await saveImage(file);
-    if (form.bool(fd, "removeImage")) imageId = null;
+    if (file instanceof File && file.size > 0) photos = [await saveImage(file), ...(photos ?? [])];
+    for (const g of fd.getAll("galleryAdd")) {
+      if (g instanceof File && g.size > 0) photos = [...(photos ?? []), await saveImage(g)];
+    }
+    if (photos && photos.length > 8) throw new UserError("8 photos maximum par plat.");
 
     // Slug unique
     let slug = slugify(name) || "plat";
@@ -120,7 +133,7 @@ export async function saveProduct(id: number | null, fd: FormData) {
       dailyLimit: nonNeg("dailyLimit"),
       maxPerOrder: nonNeg("maxPerOrder") || null,
       updatedAt: new Date(),
-      ...(imageId !== undefined ? { imageId } : {}),
+      ...(photos !== undefined ? { imageId: photos[0] ?? null, galleryImageIds: photos.slice(1) } : {}),
     };
 
     let productId = id;

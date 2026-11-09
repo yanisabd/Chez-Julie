@@ -11,6 +11,7 @@ import { getKitchenOrders } from "@/server/kitchen";
 import { parisDay } from "@/lib/time";
 
 const db = getDb();
+let testImageId = "";
 
 beforeAll(async () => {
   await runMigrations();
@@ -19,7 +20,7 @@ beforeAll(async () => {
   await updateSettings((s) => {
     s.schedule = Array.from({ length: 7 }, () => ({ open: true, ranges: [{ start: "08:00", end: "23:00", pickup: true, delivery: true }] }));
   });
-  await db.insert(schema.images).values({ data: new Uint8Array([1, 2, 3, 250]), mime: "image/webp" });
+  [{ id: testImageId }] = await db.insert(schema.images).values({ data: new Uint8Array([1, 2, 3, 250]), mime: "image/webp" }).returning({ id: schema.images.id });
 });
 
 describe("Sauvegarde / restauration", () => {
@@ -41,7 +42,9 @@ describe("Sauvegarde / restauration", () => {
     expect(restored).toHaveLength(1);
     expect(restored[0].number).toBe(o.number);
     expect(restored[0].reservation.products[0].qty).toBe(2);
-    const img = (await db.select().from(schema.images))[0];
+    const img = (await db.select().from(schema.images).where(eq(schema.images.id, testImageId)))[0];
+    // Les photos des plats sont aussi restaurées
+    expect((await db.select({ id: schema.images.id }).from(schema.images)).length).toBeGreaterThan(20);
     expect([...img.data]).toEqual([1, 2, 3, 250]);
     // Les séquences reprennent après les données restaurées
     const [cat] = await db.insert(schema.categories).values({ name: "Nouvelle" }).returning();

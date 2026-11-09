@@ -107,7 +107,8 @@ Hébergement recommandé : **Vercel** (site) + **Neon** ou **Supabase** (Postgre
    ```bash
    npm run setup:prod
    ```
-   Cela crée les tables, les réglages par défaut et **uniquement** le compte administrateur — aucune donnée de démonstration. Les commandes démarrent **en pause** : le propriétaire ajoute ses plats, horaires, zones et profils cuisine, puis rouvre les commandes dans *Horaires & créneaux*.
+   Cela crée les tables, les réglages par défaut et **uniquement** le compte administrateur — aucune donnée de démonstration.
+   Pour démarrer avec la vraie carte (plats, photos, options, recettes) : `npm run import:carte` (ne fait rien si des plats existent déjà). Les commandes démarrent **en pause** : le propriétaire ajoute ses plats, horaires, zones et profils cuisine, puis rouvre les commandes dans *Horaires & créneaux*.
 
 ### 4.2 Stripe (paiement)
 1. Créez un compte sur [stripe.com](https://stripe.com), activez-le (pièce d’identité, RIB).
@@ -144,6 +145,12 @@ Hébergement recommandé : **Vercel** (site) + **Neon** ou **Supabase** (Postgre
 > Sécurité : en production, le paiement simulé est **désactivé automatiquement**. Si Stripe n’est pas configuré, les clients ne peuvent pas commander (au lieu de commander gratuitement).
 
 ---
+
+## 4 bis. Photos des plats
+
+- **Depuis l’administration** : *Plats & catégories → un plat → Photos*. La 1re photo est la photo principale ; « Ajouter à la galerie » ajoute d’autres angles (8 maximum), l’étoile ★ choisit la photo principale. Les photos envoyées sont automatiquement recadrées, optimisées et converties en WebP.
+- **Photos de la carte de départ** : les originaux sont dans `photos-source/` (non versionné) et les versions préparées dans `assets/plats/`. Le script `npm run photos` les régénère (recadrage sur l’assiette, couleurs, netteté, visuels assemblés des formules) ; les cadrages se règlent dans `scripts/process-photos.ts`.
+- Le site sert chaque photo à la taille adaptée à l’écran (320, 640 ou 1200 px) pour rester rapide sur mobile.
 
 ## 5. Sauvegardes et restauration
 

@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD COLUMN "gallery_image_ids" uuid[] DEFAULT '{}' NOT NULL;

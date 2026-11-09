@@ -27,7 +27,7 @@ async function customer(page: Page) {
   await shot(page, "accueil-mobile");
   await page.goto(`${BASE}/menu`);
   await shot(page, "carte-mobile");
-  await page.goto(`${BASE}/plat/mafe-de-boeuf`);
+  await page.goto(`${BASE}/plat/poulet-braise-aux-poivrons`);
   await shot(page, "fiche-plat");
   await page.getByRole("button", { name: /^Ajouter/ }).click();
   await page.waitForURL(/\/menu$/);
@@ -136,7 +136,7 @@ async function main() {
   p1.on("console", (m) => m.type() === "error" && errors.push(`client console: ${m.text().slice(-700)}`));
   await customer(p1);
   // Panier « en attente » avec un plat à options, pour vérifier qu'il survit à une modification du plat par l'admin
-  await p1.goto(`${BASE}/plat/mafe-de-boeuf`);
+  await p1.goto(`${BASE}/plat/poulet-braise-aux-poivrons`);
   await p1.getByRole("button", { name: /^Ajouter/ }).click();
   await p1.waitForURL(/\/menu$/);
   const tablet = await browser.newContext({ viewport: { width: 1180, height: 820 } });

@@ -19,7 +19,9 @@
     "e2e": "tsx scripts/e2e.ts",
     "vercel-build": "tsx scripts/migrate.ts && next build",
     "setup:prod": "tsx scripts/migrate.ts && tsx scripts/seed.ts --prod",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "import:carte": "tsx scripts/import-carte.ts",
+    "photos": "tsx scripts/process-photos.ts"
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
@@ -33,6 +35,7 @@
     "pg": "^8.23.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "sharp": "^0.35.5",
     "stripe": "^23.1.0",
     "zod": "^4.6.7"
   },

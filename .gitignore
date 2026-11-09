@@ -9,3 +9,4 @@ next-env.d.ts
 e2e-screens
 .env*
 !.env.example
+photos-source

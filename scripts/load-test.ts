@@ -36,7 +36,7 @@ async function main() {
     s.ordering.defaultMaxItemsPerSlot = 5000;
   });
 
-  const thiakry = (await db.query.products.findFirst({ where: eq(schema.products.name, "Thiakry") }))!;
+  const thiakry = (await db.query.products.findFirst({ where: eq(schema.products.name, "Bouye (jus de baobab) 50 cl") }))!;
   const alloco = (await db.query.products.findFirst({ where: eq(schema.products.name, "Alloco") }))!;
   await db.update(schema.products).set({ stockQty: 10 }).where(eq(schema.products.id, thiakry.id));
   const days = await getCustomerAvailability(await getSettings(), "pickup", [{ productId: thiakry.id, qty: 1 }]);

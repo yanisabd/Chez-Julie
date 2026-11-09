@@ -12,6 +12,17 @@ import { SYSTEM } from "@/server/log";
 
 const db = getDb();
 
+/** Produit à stock suivi de la carte (boisson) : 20 en stock, 4,00 € */
+const STOCKED = "Bouye (jus de baobab) 50 cl";
+
+/** Premier choix de chaque groupe d'options obligatoire. */
+async function requiredOptions(pid: number) {
+  const groups = await db.select().from(schema.optionGroups).where(eq(schema.optionGroups.productId, pid));
+  const ids: number[] = [];
+  for (const g of groups.filter((x) => x.required)) ids.push((await db.select().from(schema.options).where(eq(schema.options.groupId, g.id)))[0].id);
+  return ids;
+}
+
 async function productId(name: string) {
   const p = await db.query.products.findFirst({ where: eq(schema.products.name, name) });
   return p!.id;
@@ -46,13 +57,13 @@ beforeEach(async () => {
 
 describe("Parcours de commande", () => {
   it("crée, paie (une seule fois) et décrémente le stock", async () => {
-    const pid = await productId("Thiakry");
+    const pid = await productId(STOCKED);
     const slot = await firstSlot(pid);
     const r = await createOrder(input({ items: [{ productId: pid, qty: 2, optionIds: [] }], slot }), null);
     expect(r.ok).toBe(true);
     const order = (await db.select().from(schema.orders))[0];
     expect(order.status).toBe("pending_payment");
-    expect(order.totalCents).toBe(900);
+    expect(order.totalCents).toBe(800);
 
     let p = await db.query.products.findFirst({ where: eq(schema.products.id, pid) });
     expect(p!.reservedQty).toBe(2);
@@ -78,11 +89,11 @@ describe("Parcours de commande", () => {
     const r = await createOrder(input({ items: [{ productId: pid, qty: 1, optionIds: [], priceCents: 1 }], slot }), null);
     expect(r.ok).toBe(true);
     const order = (await db.select().from(schema.orders))[0];
-    expect(order.subtotalCents).toBe(400);
+    expect(order.subtotalCents).toBe(450);
   });
 
   it("exige les options obligatoires", async () => {
-    const pid = await productId("Mafé de bœuf");
+    const pid = await productId("Poulet braisé aux poivrons");
     const slot = await firstSlot(pid);
     const r = await createOrder(input({ items: [{ productId: pid, qty: 1, optionIds: [] }], slot }), null);
     expect(r.ok).toBe(false);
@@ -91,7 +102,7 @@ describe("Parcours de commande", () => {
 
 describe("Stocks et commandes simultanées", () => {
   it("20 clients simultanés pour 3 dernières portions : exactement 3 commandes acceptées", async () => {
-    const pid = await productId("Thiakry");
+    const pid = await productId(STOCKED);
     await db.update(schema.products).set({ stockQty: 3 }).where(eq(schema.products.id, pid));
     const slot = await firstSlot(pid);
     const results = await Promise.all(
@@ -127,15 +138,13 @@ describe("Stocks et commandes simultanées", () => {
   });
 
   it("les ingrédients limitent les portions vendables", async () => {
-    // Brochettes suya : 160 g de bœuf par portion. 400 g => 2 portions max.
-    await db.update(schema.ingredients).set({ stock: 400 }).where(eq(schema.ingredients.name, "Bœuf"));
-    const pid = await productId("Brochettes suya");
-    const piment = await db.select().from(schema.options).where(eq(schema.options.name, "Doux"));
-    const grp = await db.select().from(schema.optionGroups).where(eq(schema.optionGroups.productId, pid));
-    const opt = piment.find((o) => o.groupId === grp[0].id)!;
+    // Poisson braisé entier : 450 g de poisson par portion. 900 g => 2 portions max.
+    await db.update(schema.ingredients).set({ stock: 900 }).where(eq(schema.ingredients.name, "Poisson"));
+    const pid = await productId("Poisson braisé entier");
+    const optIds = await requiredOptions(pid);
     const slot = await firstSlot(pid);
-    const ok = await createOrder(input({ items: [{ productId: pid, qty: 2, optionIds: [opt.id] }], slot }), null);
-    const ko = await createOrder(input({ items: [{ productId: pid, qty: 1, optionIds: [opt.id] }], slot }), null);
+    const ok = await createOrder(input({ items: [{ productId: pid, qty: 2, optionIds: optIds }], slot }), null);
+    const ko = await createOrder(input({ items: [{ productId: pid, qty: 1, optionIds: optIds }], slot }), null);
     expect(ok.ok).toBe(true);
     expect(ko.ok).toBe(false);
   });
@@ -163,7 +172,7 @@ describe("Délais et expiration", () => {
   });
 
   it("une réservation non payée est libérée automatiquement", async () => {
-    const pid = await productId("Thiakry");
+    const pid = await productId(STOCKED);
     const slot = await firstSlot(pid);
     await createOrder(input({ items: [{ productId: pid, qty: 3, optionIds: [] }], slot }), null);
     await db.update(schema.orders).set({ holdExpiresAt: new Date(Date.now() - 1000) });
@@ -178,7 +187,7 @@ describe("Délais et expiration", () => {
   });
 
   it("un paiement arrivé après expiration re-réserve si possible", async () => {
-    const pid = await productId("Thiakry");
+    const pid = await productId(STOCKED);
     const slot = await firstSlot(pid);
     await createOrder(input({ items: [{ productId: pid, qty: 1, optionIds: [] }], slot }), null);
     await db.update(schema.orders).set({ holdExpiresAt: new Date(Date.now() - 1000) });
@@ -194,7 +203,7 @@ describe("Délais et expiration", () => {
 
 describe("Annulation et statuts", () => {
   it("l’annulation rembourse, libère le créneau et remet en stock", async () => {
-    const pid = await productId("Thiakry");
+    const pid = await productId(STOCKED);
     const slot = await firstSlot(pid);
     await createOrder(input({ items: [{ productId: pid, qty: 2, optionIds: [] }], slot }), null);
     const o = (await db.select().from(schema.orders))[0];

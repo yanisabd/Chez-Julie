@@ -128,7 +128,7 @@ export default async function HomePage() {
               <Reveal key={c.id} delay={i * 80}>
                 <Link href={`/menu#cat-${c.id}`} className="group block rounded-3xl bg-white p-3 shadow-sm ring-1 ring-black/5 transition duration-300 hover:-translate-y-1.5 hover:shadow-xl">
                   <div className="overflow-hidden rounded-2xl">
-                    <DishImage imageId={c.products.find((p) => p.imageId)?.imageId ?? null} name={c.name} className="aspect-square w-full transition duration-500 group-hover:scale-110" rounded="rounded-2xl" />
+                    <DishImage imageId={c.products.find((p) => p.imageId)?.imageId ?? null} name={c.name} className="aspect-square w-full transition duration-500 group-hover:scale-110" rounded="rounded-2xl" sizes="(min-width: 1024px) 16vw, (min-width: 640px) 33vw, 50vw" />
                   </div>
                   <div className="mt-3 flex items-center justify-between px-1">
                     <div>

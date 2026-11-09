@@ -62,6 +62,7 @@ export default async function ProductEdit({ params }: { params: Promise<{ id: st
                 dailyLimit: p.dailyLimit,
                 maxPerOrder: p.maxPerOrder,
                 imageId: p.imageId,
+                galleryImageIds: p.galleryImageIds,
               }
             : null
         }
