@@ -91,6 +91,19 @@ export const settingsSchema = z.object({
       notifyAdminNewOrder: z.boolean().default(true),
       notifyAdminIssues: z.boolean().default(true),
       notifyAdminLowStock: z.boolean().default(true),
+      /** SMS (en plus des emails) */
+      sms: z
+        .object({
+          enabled: z.boolean().default(true),
+          order_confirmed: z.boolean().default(true),
+          ready: z.boolean().default(true),
+          out_for_delivery: z.boolean().default(true),
+          cancelled: z.boolean().default(true),
+          adminPhone: z.string().default(""),
+          adminNewOrder: z.boolean().default(true),
+          adminIssues: z.boolean().default(true),
+        })
+        .prefault({}),
       customer: z
         .object({
           accepted: z.boolean().default(true),

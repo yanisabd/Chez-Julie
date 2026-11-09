@@ -465,6 +465,8 @@ export const notifications = pgTable(
   {
     id: serial("id").primaryKey(),
     orderId: uuid("order_id").references(() => orders.id, { onDelete: "set null" }),
+    /** email | sms */
+    channel: text("channel").notNull().default("email"),
     type: text("type").notNull(),
     recipient: text("recipient").notNull(),
     subject: text("subject").notNull(),

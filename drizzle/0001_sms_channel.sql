@@ -1,0 +1,1 @@
+ALTER TABLE "notifications" ADD COLUMN "channel" text DEFAULT 'email' NOT NULL;

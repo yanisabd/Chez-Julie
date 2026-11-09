@@ -17,6 +17,8 @@ const BROWSER =
 
 fs.mkdirSync(OUT, { recursive: true });
 let step = 0;
+/** Jour de service de la commande passée par le client de test (AAAA-MM-JJ). */
+let serviceDay = "";
 const shot = (page: Page, name: string) => page.screenshot({ path: path.join(OUT, `${String(++step).padStart(2, "0")}-${name}.png`), fullPage: false, caret: "initial" });
 const ok = (msg: string) => console.log(`✓ ${msg}`);
 
@@ -40,6 +42,7 @@ async function customer(page: Page) {
   await page.getByRole("button", { name: /Retrait/ }).click();
   const slot = page.locator("button:not([disabled])", { hasText: /^\d{2}h\d{2} – \d{2}h\d{2}$/ }).first();
   await slot.waitFor();
+  serviceDay = (await slot.getAttribute("data-day")) ?? "";
   await slot.click();
   await shot(page, "choix-creneau");
   await page.getByRole("button", { name: /^Continuer/ }).click();
@@ -72,6 +75,8 @@ async function kitchen(page: Page) {
   if (await awa.isVisible().catch(() => false)) await awa.click();
   for (const d of "2580") await page.getByRole("button", { name: d, exact: true }).click();
   await page.waitForURL(/\/cuisine$/);
+  // La commande de test peut tomber un autre jour (soir, jour de fermeture) : on ouvre le bon jour
+  if (serviceDay) await page.goto(`${BASE}/cuisine?jour=${serviceDay}`);
   await page.getByText("Commencer la préparation").first().waitFor();
   await shot(page, "cuisine-commandes");
   await page.getByText("Commencer la préparation").first().click();

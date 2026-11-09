@@ -65,7 +65,7 @@ async function main() {
   const p2 = (await db.query.products.findFirst({ where: eq(schema.products.id, thiakry.id) }))!;
   check("Chaque paiement n’est compté qu’une fois", pays.length === pending.length, `${pays.length} paiements pour ${pending.length} commandes, ${Date.now() - t} ms`);
   check("Stock décrémenté exactement une fois", p2.stockQty === 0 && p2.reservedQty === 0, `stock ${p2.stockQty}, réservé ${p2.reservedQty}`);
-  const mails = await db.execute<{ n: number }>(sql`SELECT count(*)::int AS n FROM notifications WHERE type = 'order_confirmed'`);
+  const mails = await db.execute<{ n: number }>(sql`SELECT count(*)::int AS n FROM notifications WHERE type = 'order_confirmed' AND channel = 'email'`);
   check("Aucun email de confirmation en double", Number(mails.rows[0].n) === pending.length, `${mails.rows[0].n} emails`);
 
   // 3. Capacité d'un créneau sous forte concurrence

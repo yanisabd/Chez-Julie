@@ -3,13 +3,17 @@ import { db, schema, type DBorTx } from "@/db";
 import { getSettings } from "./settings";
 import { renderAdminEmail, renderCustomerEmail, appUrl, type CustomerEmailType, type EmailOrder } from "./email-templates";
 import { logSystem } from "./log";
+import { renderCustomerSms, type CustomerSmsType } from "./sms-templates";
+import { toInternational, canReceiveSms, smsSenderName } from "@/lib/phone";
 
 const MAX_ATTEMPTS = 6;
 const BACKOFF_MIN = [1, 5, 15, 60, 180, 360];
 
 export const emailsEnabled = () => !!process.env.RESEND_API_KEY;
+export const smsEnabled = () => !!process.env.BREVO_API_KEY;
 
 type Enqueue = {
+  channel?: "email" | "sms";
   orderId?: string | null;
   type: string;
   recipient: string;
@@ -23,7 +27,7 @@ type Enqueue = {
 export async function enqueue(tx: DBorTx, n: Enqueue) {
   await tx
     .insert(schema.notifications)
-    .values({ ...n, orderId: n.orderId ?? null })
+    .values({ ...n, channel: n.channel ?? "email", orderId: n.orderId ?? null })
     .onConflictDoNothing({ target: schema.notifications.dedupeKey });
 }
 
@@ -35,6 +39,7 @@ export async function loadEmailOrder(tx: DBorTx, orderId: string) {
 }
 
 const TOGGLEABLE = ["accepted", "preparing", "ready", "out_for_delivery", "completed"] as const;
+const SMS_TYPES: CustomerSmsType[] = ["order_confirmed", "ready", "out_for_delivery", "cancelled"];
 
 export async function enqueueCustomerEmail(
   tx: DBorTx,
@@ -44,9 +49,26 @@ export async function enqueueCustomerEmail(
   dedupeSuffix = "",
 ) {
   const settings = await getSettings(tx);
-  if ((TOGGLEABLE as readonly string[]).includes(type) && !settings.notifications.customer[type as (typeof TOGGLEABLE)[number]]) return;
   const loaded = await loadEmailOrder(tx, orderId);
   if (!loaded || loaded.order.anonymizedAt) return;
+
+  // SMS (en plus de l'email) pour les moments clés
+  const sms = settings.notifications.sms;
+  if (sms.enabled && SMS_TYPES.includes(type as CustomerSmsType) && sms[type as CustomerSmsType] && canReceiveSms(loaded.order.phone)) {
+    const text = renderCustomerSms(type as CustomerSmsType, loaded.emailOrder, settings, { refundCents: extra.refundCents });
+    await enqueue(tx, {
+      channel: "sms",
+      orderId,
+      type,
+      recipient: toInternational(loaded.order.phone)!,
+      subject: `SMS – ${type}`,
+      html: "",
+      text,
+      dedupeKey: `${orderId}:sms:${type}${dedupeSuffix}`,
+    });
+  }
+
+  if ((TOGGLEABLE as readonly string[]).includes(type) && !settings.notifications.customer[type as (typeof TOGGLEABLE)[number]]) return;
   const mail = renderCustomerEmail(type, loaded.emailOrder, settings, extra);
   await enqueue(tx, {
     orderId,
@@ -72,7 +94,47 @@ export async function enqueueAdminEmail(
   await enqueue(tx, { orderId: orderId ?? null, type: "admin", recipient: to, ...mail, dedupeKey: `admin:${dedupeKey}` });
 }
 
-async function deliver(n: typeof schema.notifications.$inferSelect): Promise<{ ok: true; id: string | null; simulated?: boolean } | { ok: false; error: string; permanent?: boolean }> {
+/** SMS d'alerte pour le gérant (nouvelle commande, problème en cuisine). */
+export async function enqueueAdminSms(tx: DBorTx, dedupeKey: string, text: string, kind: "adminNewOrder" | "adminIssues", orderId?: string) {
+  const sms = (await getSettings(tx)).notifications.sms;
+  if (!sms.enabled || !sms[kind] || !sms.adminPhone) return;
+  const to = toInternational(sms.adminPhone);
+  if (!to) return;
+  await enqueue(tx, { channel: "sms", orderId: orderId ?? null, type: "admin", recipient: to, subject: "SMS – alerte gérant", html: "", text: text.slice(0, 300), dedupeKey: `admin:sms:${dedupeKey}` });
+}
+
+type DeliverResult = { ok: true; id: string | null; simulated?: boolean } | { ok: false; error: string; permanent?: boolean };
+
+/** Envoi d'un SMS via Brevo (API transactionnelle). */
+async function deliverSms(n: typeof schema.notifications.$inferSelect): Promise<DeliverResult> {
+  if (!smsEnabled()) return { ok: true, id: null, simulated: true };
+  try {
+    const settings = await getSettings();
+    const res = await fetch("https://api.brevo.com/v3/transactionalSMS/sms", {
+      method: "POST",
+      headers: { "api-key": process.env.BREVO_API_KEY!, "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        sender: smsSenderName(process.env.SMS_SENDER || settings.business.name),
+        recipient: n.recipient,
+        content: n.text,
+        type: "transactional",
+        tag: n.type,
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (res.ok) {
+      const j = (await res.json().catch(() => ({}))) as { messageId?: number | string; reference?: string };
+      return { ok: true, id: String(j.messageId ?? j.reference ?? "") || null };
+    }
+    const body = await res.text();
+    return { ok: false, error: `HTTP ${res.status} ${body.slice(0, 300)}`, permanent: res.status >= 400 && res.status < 500 && res.status !== 429 };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+async function deliver(n: typeof schema.notifications.$inferSelect): Promise<DeliverResult> {
+  if (n.channel === "sms") return deliverSms(n);
   if (!emailsEnabled()) return { ok: true, id: null, simulated: true };
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -144,7 +206,7 @@ export async function processOutbox(limit = 20) {
           nextAttemptAt: new Date(Date.now() + BACKOFF_MIN[Math.min(attempts - 1, BACKOFF_MIN.length - 1)] * 60000),
         })
         .where(eq(schema.notifications.id, id));
-      if (failed) await logSystem("error", `Échec définitif d’envoi d’email à ${n.recipient} (${n.subject})`, { error: r.error, notificationId: id });
+      if (failed) await logSystem("error", `Échec définitif d’envoi ${n.channel === "sms" ? "de SMS" : "d’email"} à ${n.recipient} (${n.subject})`, { error: r.error, notificationId: id });
     }
   }
   return sent;

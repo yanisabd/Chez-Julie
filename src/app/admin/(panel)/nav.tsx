@@ -57,7 +57,7 @@ const GROUPS = [
     items: [
       { href: "/admin/paiements", label: "Paiements", icon: CreditCard },
       { href: "/admin/statistiques", label: "Statistiques", icon: BarChart3 },
-      { href: "/admin/emails", label: "Emails envoyés", icon: Mail },
+      { href: "/admin/emails", label: "Emails & SMS", icon: Mail },
       { href: "/admin/journal", label: "Journal & sauvegardes", icon: ShieldCheck },
       { href: "/admin/parametres", label: "Paramètres du site", icon: Settings },
     ],

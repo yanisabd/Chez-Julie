@@ -6,6 +6,7 @@ import { guarded, form, UserError } from "@/server/action";
 import { getSettings, saveSettings } from "@/server/settings";
 import { retryNotifications } from "@/server/notifications";
 import { audit } from "@/server/log";
+import { toInternational } from "@/lib/phone";
 
 export async function saveBusiness(fd: FormData) {
   return guarded(["admin"], async ({ actor }) => {
@@ -54,6 +55,18 @@ export async function saveNotificationSettings(fd: FormData) {
     n.notifyAdminIssues = form.bool(fd, "notifyAdminIssues");
     n.notifyAdminLowStock = form.bool(fd, "notifyAdminLowStock");
     for (const k of Object.keys(n.customer) as (keyof typeof n.customer)[]) n.customer[k] = form.bool(fd, `c_${k}`);
+    const phone = form.str(fd, "sms_adminPhone");
+    if (phone && !toInternational(phone)) throw new UserError("Numéro de mobile invalide.");
+    n.sms = {
+      enabled: form.bool(fd, "sms_enabled"),
+      order_confirmed: form.bool(fd, "sms_order_confirmed"),
+      ready: form.bool(fd, "sms_ready"),
+      out_for_delivery: form.bool(fd, "sms_out_for_delivery"),
+      cancelled: form.bool(fd, "sms_cancelled"),
+      adminPhone: phone,
+      adminNewOrder: form.bool(fd, "sms_adminNewOrder"),
+      adminIssues: form.bool(fd, "sms_adminIssues"),
+    };
     await saveSettings(s);
     await audit(actor, "settings.notifications", "settings");
     return { ok: true, message: "Préférences enregistrées" };

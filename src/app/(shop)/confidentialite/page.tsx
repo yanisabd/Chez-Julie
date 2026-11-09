@@ -23,7 +23,7 @@ export default async function Page() {
       <h2>Destinataires</h2>
       <p>
         Seules les personnes qui en ont besoin y accèdent : le responsable et, pour la préparation, l’équipe de cuisine (qui ne voit que le prénom et le contenu de la commande). Sous-traitants techniques : hébergeur, Stripe (paiement),
-        Resend (envoi d’emails).
+        Resend (envoi d’emails), Brevo (envoi des SMS de suivi de commande). Votre numéro de téléphone sert uniquement au suivi de vos commandes : nous ne l’utilisons jamais pour de la publicité.
       </p>
       <h2>Durée de conservation</h2>
       <p>

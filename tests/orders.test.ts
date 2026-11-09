@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { runMigrations } from "@/db/migrate";
 import { seed, truncateAll } from "@/db/seed-data";
@@ -67,7 +67,7 @@ describe("Parcours de commande", () => {
     const o2 = await db.query.orders.findFirst({ where: eq(schema.orders.id, order.id) });
     expect(o2!.status).toBe("accepted");
     expect(o2!.paymentStatus).toBe("paid");
-    const mails = await db.select().from(schema.notifications).where(eq(schema.notifications.type, "order_confirmed"));
+    const mails = await db.select().from(schema.notifications).where(and(eq(schema.notifications.type, "order_confirmed"), eq(schema.notifications.channel, "email")));
     expect(mails).toHaveLength(1);
     expect((await db.select().from(schema.payments)).length).toBe(1);
   });
@@ -226,7 +226,7 @@ describe("Annulation et statuts", () => {
     expect((await changeStatus(o.id, "preparing", "ready", SYSTEM, "kitchen")).ok).toBe(true);
     expect((await changeStatus(o.id, "ready", "completed", SYSTEM, "kitchen")).ok).toBe(true);
     // L'email « prête » n'est envoyé qu'une fois malgré le retour arrière
-    const ready = await db.select().from(schema.notifications).where(eq(schema.notifications.type, "ready"));
+    const ready = await db.select().from(schema.notifications).where(and(eq(schema.notifications.type, "ready"), eq(schema.notifications.channel, "email")));
     expect(ready).toHaveLength(1);
     const count = await db.execute<{ n: number }>(sql`SELECT count(*)::int AS n FROM order_events WHERE order_id = ${o.id}`);
     expect(Number(count.rows[0].n)).toBeGreaterThan(5);

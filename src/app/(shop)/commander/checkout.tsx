@@ -277,6 +277,7 @@ export function Checkout({ config, prefill }: { config: Config; prefill: { name:
                         key={s.key}
                         type="button"
                         disabled={!ok}
+                        data-day={currentDay.day}
                         onClick={() => setSlot({ key: s.key, label: s.label, day: currentDay.day })}
                         className={cn(
                           "rounded-xl px-2 py-3 text-center ring-2 transition",
@@ -327,7 +328,7 @@ export function Checkout({ config, prefill }: { config: Config; prefill: { name:
             <Field label="Email" error={errors.email} htmlFor="email">
               <Input id="email" type="email" autoComplete="email" inputMode="email" value={details.email} onChange={set("email")} required />
             </Field>
-            <Field label="Téléphone" error={errors.phone} htmlFor="phone">
+            <Field label="Téléphone mobile" error={errors.phone} hint="Vous recevrez un SMS quand votre commande sera prête." htmlFor="phone">
               <Input id="phone" type="tel" autoComplete="tel" inputMode="tel" value={details.phone} onChange={set("phone")} required />
             </Field>
           </div>

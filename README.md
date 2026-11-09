@@ -37,7 +37,8 @@ Sans aucune configuration, le site fonctionne en **mode démonstration** :
 |---|---|---|
 | Base de données | PostgreSQL embarqué (dossier `data/`) | PostgreSQL hébergé (`DATABASE_URL`) |
 | Paiement | Page de paiement simulé | Stripe (carte, Apple Pay, Google Pay) |
-| Emails | Non envoyés, visibles dans *Admin → Emails envoyés* | Envoyés par Resend |
+| Emails | Non envoyés, visibles dans *Admin → Emails & SMS* | Envoyés par Resend |
+| SMS | Non envoyés, visibles dans *Admin → Emails & SMS* | Envoyés par Brevo |
 
 **Accès de démonstration** (à changer avant la mise en ligne) :
 
@@ -122,9 +123,15 @@ Hébergement recommandé : **Vercel** (site) + **Neon** ou **Supabase** (Postgre
 1. Créez un compte sur [resend.com](https://resend.com), ajoutez et **vérifiez votre domaine** (enregistrements DNS fournis).
 2. Créez une clé API → `RESEND_API_KEY`, et définissez `EMAIL_FROM="Mounoukid <commandes@votre-domaine.fr>"`.
 
+### 4.3 bis Brevo (SMS)
+1. Créez un compte sur [brevo.com](https://www.brevo.com) et achetez un pack de crédits SMS (environ 0,045 € le SMS en France).
+2. *SMTP & API → Clés API* : créez une clé → `BREVO_API_KEY`.
+3. Facultatif : `SMS_SENDER` = nom d’expéditeur affiché (3 à 11 lettres, ex. `ChezJulie`).
+4. Le client reçoit un SMS quand sa commande est **confirmée**, **prête**, **en livraison** ou **annulée** (réglable dans *Admin → Emails & SMS*). Le gérant peut aussi recevoir un SMS à chaque nouvelle commande et à chaque problème signalé par la cuisine.
+
 ### 4.4 Vercel (site)
 1. Mettez le code sur GitHub, puis *Vercel → Add New Project* → importez le dépôt.
-2. Variables d’environnement : `APP_URL` (ex. `https://mounoukid.fr`), `DATABASE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`, `CRON_SECRET` (chaîne aléatoire longue).
+2. Variables d’environnement : `APP_URL` (ex. `https://mounoukid.fr`), `DATABASE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`, `BREVO_API_KEY`, `SMS_SENDER`, `CRON_SECRET` (chaîne aléatoire longue).
 3. Déployez. Les migrations de base s’exécutent automatiquement à chaque déploiement (`vercel-build`).
 4. *Settings → Domains* : branchez votre nom de domaine (HTTPS automatique).
 5. La tâche planifiée `/api/cron` (fichier `vercel.json`) libère les réservations expirées et relance les emails. Sur l’offre gratuite de Vercel, les tâches planifiées sont limitées à une fois par jour : ce n’est pas bloquant car **le site exécute aussi ces tâches à chaque visite**.
@@ -216,7 +223,7 @@ LOAD_TEST_DATABASE_URL=postgres://… npm run load-test
 | Base de données | PostgreSQL + Drizzle ORM (PGlite embarqué en local) |
 | Authentification | Sessions sécurisées maison (bcrypt), code PIN pour la cuisine |
 | Paiement | Stripe Checkout + webhooks |
-| Emails | Resend, file d’envoi avec réessais et anti-doublon |
+| Emails & SMS | Resend (emails) et Brevo (SMS), file d’envoi commune avec réessais et anti-doublon |
 | Images | Stockées en base, redimensionnées et converties en WebP (sharp) |
 | Référencement | sitemap.xml, robots.txt, image de partage générée, données structurées « Restaurant » |
 | Application | Site et écran cuisine installables (manifest + icônes générées) |

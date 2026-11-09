@@ -4,14 +4,14 @@ import { db, schema } from "@/db";
 import type { OrderStatus } from "@/lib/constants";
 import { STATUS } from "@/lib/constants";
 import { nextStatus, previousStatus } from "@/lib/status-flow";
-import { parisDay, isoWeekday } from "@/lib/time";
+import { parisDay, isoWeekday, formatHour } from "@/lib/time";
 import { formatPrice } from "@/lib/format";
 import { getSettings } from "./settings";
 import { buildDay } from "./slots";
 import { reserve, commit, release, AvailabilityError } from "./inventory";
 import { priceCart, findDeliveryZone, checkPromo, deliveryFee } from "./pricing";
 import { createCheckout, stripeEnabled, refundPayment, expireCheckoutSession } from "./payments";
-import { enqueueCustomerEmail, enqueueAdminEmail, flushOutboxSafely } from "./notifications";
+import { enqueueCustomerEmail, enqueueAdminEmail, enqueueAdminSms, flushOutboxSafely } from "./notifications";
 import { randomToken } from "./auth";
 import { audit, logSystem, SYSTEM, type Actor } from "./log";
 
@@ -281,6 +281,13 @@ export async function markOrderPaid(p: { orderId: string; provider: "stripe" | "
         { path: `/admin/commandes/${order.id}`, label: "Voir la commande" },
         order.id,
       );
+    await enqueueAdminSms(
+      tx,
+      `new:${order.id}`,
+      `${settings.business.name} : nouvelle commande n°${order.number} (${formatPrice(order.totalCents)}), ${order.mode === "pickup" ? "retrait" : "livraison"} le ${order.serviceDay.split("-").reverse().slice(0, 2).join("/")} à ${formatHour(order.slotStart)}.`,
+      "adminNewOrder",
+      order.id,
+    );
     if (settings.notifications.notifyAdminLowStock) {
       for (const l of low) {
         const name =
@@ -509,6 +516,7 @@ export async function reportIssue(orderId: string, reason: string, message: stri
         orderId,
       );
   });
+  await enqueueAdminSms(db, `issue:${orderId}:${Date.now()}`, `${settings.business.name} : problème signalé sur la commande n°${order.number} – ${reason}${message ? ` : ${message}` : ""} (${actor.label})`, "adminIssues", orderId);
   await audit(actor, "order.issue", "order", orderId, { reason, message });
   await flushOutboxSafely();
   return { ok: true as const };
