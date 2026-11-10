@@ -96,7 +96,7 @@ async function kitchen(page: Page) {
 
 async function admin(page: Page) {
   await page.goto(`${BASE}/admin/connexion`);
-  await page.fill("#email", "admin@chezjulie.fr");
+  await page.fill("#email", "admin@chezjuju.fr");
   await page.fill("#password", "ChangezMoi-2026!");
   await page.getByRole("button", { name: "Se connecter" }).click();
   await page.waitForURL(/\/admin$/);

@@ -56,7 +56,7 @@ describe("Numéros de téléphone", () => {
     expect(canReceiveSms("01 23 45 67 89")).toBe(false);
   });
   it("produit un nom d’expéditeur valide", () => {
-    expect(smsSenderName("Chez Julie")).toBe("ChezJulie");
+    expect(smsSenderName("Chez Juju")).toBe("ChezJuju");
     expect(smsSenderName("Saveurs d’Afrique & Co")).toBe("SaveursdAfr");
   });
 });
@@ -126,7 +126,7 @@ describe("Envoi via Brevo", () => {
     const sms = calls.find((c) => c.url.includes("brevo"));
     expect(sms?.url).toBe("https://api.brevo.com/v3/transactionalSMS/sms");
     expect(sms?.headers["api-key"]).toBe("test-key");
-    expect(sms?.body).toMatchObject({ recipient: "33612345678", type: "transactional", sender: "ChezJulie" });
+    expect(sms?.body).toMatchObject({ recipient: "33612345678", type: "transactional", sender: "ChezJuju" });
     const row = (await smsOf(o.id))[0];
     expect(row.status).toBe("sent");
     expect(row.providerId).toBe("42");

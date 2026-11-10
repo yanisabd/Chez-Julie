@@ -29,7 +29,7 @@ async function main() {
     return;
   }
 
-  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@chezjulie.fr";
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@chezjuju.fr";
   const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "ChangezMoi-2026!";
   await seed(db, { adminEmail, adminPassword });
   console.log("✓ Données de démonstration créées");
