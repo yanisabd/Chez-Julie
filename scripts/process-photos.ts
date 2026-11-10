@@ -24,14 +24,19 @@ const L = 1.44; // photos 2160×2880 / 2880×2160 affichées en 1500×2000 / 200
 const P = 1.104; // photos 1242×2208 affichées en 1125×2000
 
 export const PHOTOS: Record<string, Crop> = {
-  // Poisson en sauce pimentée
+  // Poisson en sauce
   "poisson-sauce-1": { src: 1, f: L, mode: "square", cx: 745, cy: 900, side: 1480 },
   "poisson-sauce-2": { src: 2, f: P, mode: "fit", x: 0, y: 320, w: 1125, h: 1410 },
   // Poulet braisé aux poivrons
   "poulet-braise-1": { src: 8, f: L, mode: "square", cx: 915, cy: 820, side: 1560 },
   "poulet-braise-2": { src: 4, f: L, mode: "square", cx: 980, cy: 735, side: 1400 },
   "poulet-braise-3": { src: 5, f: L, mode: "fit", x: 0, y: 260, w: 2000, h: 1050 },
-  // Épinards sautés aux crevettes
+  // Pilons de poulet seuls (grillade)
+  "pilons-1": { src: 10, f: P, mode: "square", cx: 565, cy: 1140, side: 1090 },
+  "pilons-2": { src: 10, f: P, mode: "square", cx: 450, cy: 1150, side: 700 },
+  // Riz blanc seul (isolé de la photo pilons + riz)
+  "riz-1": { src: 15, f: P, mode: "square", cx: 790, cy: 690, side: 600 },
+  // Épinards sautés
   "epinards-1": { src: 3, f: L, mode: "square", cx: 945, cy: 760, side: 1480 },
   "epinards-2": { src: 9, f: L, mode: "square", cx: 1045, cy: 820, side: 1470 },
   // Alloco
@@ -62,10 +67,10 @@ export const PHOTOS: Record<string, Crop> = {
 
 /** Visuels des formules : assiettes rondes assemblées sur un fond aux couleurs du site. */
 export const COMPOSITES: Record<string, { plates: { photo: string; d: number; x: number; y: number }[] }> = {
-  "formule-poisson-sauce-alloco": {
+  "formule-poisson-sauce-riz": {
     plates: [
       { photo: "poisson-sauce-1", d: 800, x: 40, y: 40 },
-      { photo: "alloco-1", d: 560, x: 600, y: 600 },
+      { photo: "riz-1", d: 560, x: 600, y: 600 },
     ],
   },
   "formule-poulet-epinards-alloco": {
