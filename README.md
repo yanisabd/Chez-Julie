@@ -1,8 +1,8 @@
-# Mounoukid — Dark kitchen de cuisine africaine
+# Chez Julie — Dark kitchen de cuisine africaine
 
 Site de commande en ligne avec **espace client**, **espace cuisine** et **espace administrateur**, conforme au cahier des charges v1.0.
 
-> Le nom « Mounoukid », les textes, les plats et les photos sont des valeurs de démonstration : tout se modifie depuis **Administration → Paramètres du site** et **Plats & catégories**.
+> Les textes, prix et réglages de la démo sont modifiables : tout se modifie depuis **Administration → Paramètres du site** et **Plats & catégories**.
 
 ---
 
@@ -45,7 +45,7 @@ Sans aucune configuration, le site fonctionne en **mode démonstration** :
 | Espace | Adresse | Identifiants |
 |---|---|---|
 | Site client | http://localhost:3000 | — |
-| Administration | http://localhost:3000/admin | `admin@mounoukid.fr` / `ChangezMoi-2026!` |
+| Administration | http://localhost:3000/admin | `admin@chezjulie.fr` / `ChangezMoi-2026!` |
 | Cuisine | http://localhost:3000/cuisine | profil **Awa**, code **2580** |
 
 Code promo de démonstration : `BIENVENUE10`. Codes postaux livrés : 75011, 75012, 75020, 93100, 93170, 94300, 94160.
@@ -122,7 +122,7 @@ Hébergement recommandé : **Vercel** (site) + **Neon** ou **Supabase** (Postgre
 
 ### 4.3 Resend (emails)
 1. Créez un compte sur [resend.com](https://resend.com), ajoutez et **vérifiez votre domaine** (enregistrements DNS fournis).
-2. Créez une clé API → `RESEND_API_KEY`, et définissez `EMAIL_FROM="Mounoukid <commandes@votre-domaine.fr>"`.
+2. Créez une clé API → `RESEND_API_KEY`, et définissez `EMAIL_FROM="Chez Julie <commandes@votre-domaine.fr>"`.
 
 ### 4.3 bis Brevo (SMS)
 1. Créez un compte sur [brevo.com](https://www.brevo.com) et achetez un pack de crédits SMS (environ 0,045 € le SMS en France).
@@ -132,7 +132,7 @@ Hébergement recommandé : **Vercel** (site) + **Neon** ou **Supabase** (Postgre
 
 ### 4.4 Vercel (site)
 1. Mettez le code sur GitHub, puis *Vercel → Add New Project* → importez le dépôt.
-2. Variables d’environnement : `APP_URL` (ex. `https://mounoukid.fr`), `DATABASE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`, `BREVO_API_KEY`, `SMS_SENDER`, `CRON_SECRET` (chaîne aléatoire longue).
+2. Variables d’environnement : `APP_URL` (ex. `https://chezjulie.fr`), `DATABASE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM`, `BREVO_API_KEY`, `SMS_SENDER`, `CRON_SECRET` (chaîne aléatoire longue).
 3. Déployez. Les migrations de base s’exécutent automatiquement à chaque déploiement (`vercel-build`).
 4. *Settings → Domains* : branchez votre nom de domaine (HTTPS automatique).
 5. La tâche planifiée `/api/cron` (fichier `vercel.json`) libère les réservations expirées et relance les emails. Sur l’offre gratuite de Vercel, les tâches planifiées sont limitées à une fois par jour : ce n’est pas bloquant car **le site exécute aussi ces tâches à chaque visite**.

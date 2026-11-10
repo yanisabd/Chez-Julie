@@ -126,7 +126,7 @@ describe("Envoi via Brevo", () => {
     const sms = calls.find((c) => c.url.includes("brevo"));
     expect(sms?.url).toBe("https://api.brevo.com/v3/transactionalSMS/sms");
     expect(sms?.headers["api-key"]).toBe("test-key");
-    expect(sms?.body).toMatchObject({ recipient: "33612345678", type: "transactional", sender: "Mounoukid" });
+    expect(sms?.body).toMatchObject({ recipient: "33612345678", type: "transactional", sender: "ChezJulie" });
     const row = (await smsOf(o.id))[0];
     expect(row.status).toBe("sent");
     expect(row.providerId).toBe("42");

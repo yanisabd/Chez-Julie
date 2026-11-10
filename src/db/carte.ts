@@ -55,7 +55,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Poulet braisé aux poivrons",
     cat: "Grillades",
-    price: 13.5,
+    price: 8,
     featured: true,
     description: "Morceaux de poulet marinés, braisés et caramélisés, puis sautés aux poivrons, oignons et herbes fraîches.",
     ingredients: "Poulet, poivrons rouges et verts, oignons, ail, persil, moutarde, épices.",
@@ -69,7 +69,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Pilons de poulet grillés",
     cat: "Grillades",
-    price: 10.5,
+    price: 8,
     featured: true,
     description: "Pilons de poulet marinés aux épices puis grillés jusqu’à être bien dorés, servis avec poivrons et oignon rouge.",
     ingredients: "Poulet, poivrons, oignon rouge, ail, gingembre, épices.",
@@ -82,7 +82,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Poisson braisé entier",
     cat: "Grillades",
-    price: 16.5,
+    price: 9.5,
     featured: true,
     description: "Tilapia entier mariné aux épices et braisé, servi sur un lit de salade avec oignons rouges, poivrons et citron.",
     ingredients: "Tilapia, oignon rouge, poivrons, salade, citron, ail, moutarde, épices.",
@@ -97,7 +97,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Pilons de poulet & riz parfumé",
     cat: "Plats",
-    price: 12.5,
+    price: 8,
     featured: true,
     description: "Pilons de poulet marinés puis dorés, servis avec un riz blanc parfumé, lamelles de poivrons et d’oignon rouge.",
     ingredients: "Poulet, riz, poivrons, oignon rouge, ail, gingembre, épices.",
@@ -110,7 +110,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Poisson en sauce",
     cat: "Plats",
-    price: 14.5,
+    price: 9.5,
     featured: true,
     description: "Poisson mijoté dans un bouillon doré aux oignons, tomate et herbes fraîches. Le court-bouillon comme à la maison.",
     ingredients: "Poisson, oignons, tomate, ail, céleri, persil, épices.",
@@ -124,7 +124,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Alloco",
     cat: "Accompagnements",
-    price: 4.5,
+    price: 3,
     featured: true,
     description: "Bananes plantain bien mûres, frites et caramélisées : dorées dehors, fondantes dedans.",
     ingredients: "Banane plantain, huile, sel.",
@@ -134,7 +134,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Riz blanc parfumé",
     cat: "Accompagnements",
-    price: 3.5,
+    price: 2.5,
     description: "Riz blanc parfumé, léger et bien détaché, avec quelques lamelles de poivrons et d’oignon rouge.",
     ingredients: "Riz, poivrons, oignon rouge, sel.",
     allergens: [],
@@ -144,7 +144,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Épinards sautés",
     cat: "Accompagnements",
-    price: 6.5,
+    price: 3,
     description: "Épinards fondants sautés aux oignons et à la cébette, dans un bouillon doux et parfumé.",
     ingredients: "Épinards, oignons, cébette, huile, épices.",
     allergens: [],
@@ -153,7 +153,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Salade avocat & maïs",
     cat: "Accompagnements",
-    price: 6.5,
+    price: 3,
     description: "Laitue croquante, avocat, maïs, poivron rouge et cébette, nappés d’une sauce crémeuse maison.",
     ingredients: "Laitue, avocat, maïs, poivron rouge, cébette, sauce maison (œuf, moutarde, huile).",
     allergens: ["oeufs", "moutarde"],
@@ -163,7 +163,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Formule Poulet braisé, épinards & alloco",
     cat: "Menus & formules",
-    price: 22,
+    price: 15.5,
     featured: true,
     description: "Le grand classique : poulet braisé aux poivrons, épinards sautés, alloco et une boisson maison.",
     ingredients: "Voir le détail de chaque plat.",
@@ -177,7 +177,7 @@ export const PRODUCTS: ProductSeed[] = [
   {
     name: "Formule Poisson en sauce & riz",
     cat: "Menus & formules",
-    price: 17,
+    price: 14,
     description: "Poisson en sauce, riz blanc parfumé et une boisson maison.",
     ingredients: "Voir le détail de chaque plat.",
     allergens: ["poissons", "celeri"],
@@ -187,17 +187,17 @@ export const PRODUCTS: ProductSeed[] = [
     photos: ["formule-poisson-sauce-riz", "poisson-sauce-1", "riz-1"],
   },
   {
-    name: "Formule Poisson braisé & beignets",
+    name: "Formule Poisson braisé & épinards",
     cat: "Menus & formules",
-    price: 20.5,
-    description: "Poisson braisé entier, beignets maison et une boisson maison.",
+    price: 14.5,
+    description: "Poisson braisé entier, épinards sautés et une boisson maison.",
     ingredients: "Voir le détail de chaque plat.",
-    allergens: ["poissons", "moutarde", "gluten"],
+    allergens: ["poissons", "moutarde"],
     spicy: 1,
     daily: 8,
     options: [PIMENT, BOISSON],
     recipe: [["Poisson", 450]],
-    photos: ["formule-poisson-braise-beignets", "ensemble-poisson-beignets"],
+    photos: ["formule-poisson-braise-epinards", "poisson-braise-2", "epinards-1"],
   },
   // ---------------------------------------------------------------- Desserts
   {

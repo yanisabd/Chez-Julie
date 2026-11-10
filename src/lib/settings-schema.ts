@@ -17,7 +17,7 @@ export const daySchema = z.object({
 export const settingsSchema = z.object({
   business: z
     .object({
-      name: z.string().default("Mounoukid"),
+      name: z.string().default("Chez Julie"),
       tagline: z.string().default("Cuisine africaine faite maison"),
       about: z
         .string()
@@ -25,9 +25,9 @@ export const settingsSchema = z.object({
           "Des recettes d’Afrique de l’Ouest et Centrale, cuisinées à la commande avec des produits frais. Commandez à l’avance, on s’occupe du reste.",
         ),
       phone: z.string().default("06 00 00 00 00"),
-      email: z.string().default("contact@mounoukid.fr"),
+      email: z.string().default("contact@chezjulie.fr"),
       pickupAddress: z.string().default("12 rue de l’Exemple, 75000 Paris"),
-      pickupInstructions: z.string().default("Sonnez à l’interphone « Mounoukid ». Merci de respecter votre créneau."),
+      pickupInstructions: z.string().default("Sonnez à l’interphone « Chez Julie ». Merci de respecter votre créneau."),
       announcement: z.string().default(""),
       instagram: z.string().default(""),
     })

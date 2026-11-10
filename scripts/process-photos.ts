@@ -62,7 +62,6 @@ export const PHOTOS: Record<string, Crop> = {
   // Photos d'ensemble (galeries des formules)
   "ensemble-poulet-epinards-alloco": { src: 7, f: L, mode: "fit", x: 0, y: 0, w: 2000, h: 1500 },
   "ensemble-poulet-epinards": { src: 6, f: L, mode: "fit", x: 0, y: 170, w: 2000, h: 1170 },
-  "ensemble-poisson-beignets": { src: 25, f: P, mode: "fit", x: 0, y: 240, w: 1125, h: 1720 },
 };
 
 /** Visuels des formules : assiettes rondes assemblées sur un fond aux couleurs du site. */
@@ -80,10 +79,10 @@ export const COMPOSITES: Record<string, { plates: { photo: string; d: number; x:
       { photo: "alloco-1", d: 540, x: 360, y: 620 },
     ],
   },
-  "formule-poisson-braise-beignets": {
+  "formule-poisson-braise-epinards": {
     plates: [
       { photo: "poisson-braise-1", d: 800, x: 40, y: 40 },
-      { photo: "beignets-1", d: 560, x: 600, y: 600 },
+      { photo: "epinards-1", d: 560, x: 600, y: 600 },
     ],
   },
 };

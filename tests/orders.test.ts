@@ -89,7 +89,7 @@ describe("Parcours de commande", () => {
     const r = await createOrder(input({ items: [{ productId: pid, qty: 1, optionIds: [], priceCents: 1 }], slot }), null);
     expect(r.ok).toBe(true);
     const order = (await db.select().from(schema.orders))[0];
-    expect(order.subtotalCents).toBe(450);
+    expect(order.subtotalCents).toBe(300);
   });
 
   it("exige les options obligatoires", async () => {
